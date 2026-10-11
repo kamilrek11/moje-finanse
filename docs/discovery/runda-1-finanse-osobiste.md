@@ -5,7 +5,7 @@ Status: w toku. Odpowiedzi właściciela produktu na pytania specjalisty ds. fin
 ## Potwierdzone decyzje
 | ID | Decyzja |
 |----|---------|
-| A1 | MVP: budżet + fundusz awaryjny + cele. Inwestowanie (treści, symulatory) w kolejnym etapie |
+| A1 | MVP: budżet + fundusz awaryjny + cele. Symulatory inwestycyjne w etapie 2; w MVP tylko karty edukacyjne o produktach |
 | A2 | Kolejność ścieżki sugerowana, wszystkie moduły dostępne |
 | B2 | Tylko umowa o pracę w MVP |
 | B1 | Brak badań użytkowników. Założenia o grupie 22–35 lat to hipotezy; wywiady przed lub w trakcie MVP (zadanie dla analityka) |
@@ -35,7 +35,7 @@ Status: w toku. Odpowiedzi właściciela produktu na pytania specjalisty ds. fin
 - **J1:** właściciel nie planuje konsultacji prawnej (KNF/MiFID II). Zapisane jako ryzyko. Treści inwestycyjne trzymać na poziomie ogólnej edukacji, bez nazw instytucji i instrumentów, bez rankingów produktów.
 
 ## Rozstrzygnięta sprzeczność A1/I1
-Symulatory inwestycyjne (IKE/IKZE, PPK, ETF) przeniesione do etapu 2. W MVP zostają karty edukacyjne o tych produktach (F2, F3 dotyczą etapu 2 w części symulatorów). Wpływ: mniej faktów do weryfikacji w MVP i mniejsze ryzyko prawne w pierwszym wydaniu.
+Symulatory inwestycyjne (IKE/IKZE, PPK, ETF) przeniesione do etapu 2. W MVP zostają karty edukacyjne o tych produktach. Wpływ: mniej faktów do weryfikacji w MVP i mniejsze ryzyko prawne w pierwszym wydaniu.
 
 ## Otwarte pytania blokujące MVP z listy finansów osobistych
 Brak. Pozostałe pytania [WAŻNE] i [PÓŹNIEJ] do kolejnych rund.
