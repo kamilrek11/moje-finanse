@@ -25,6 +25,7 @@ Status: w toku. Odpowiedzi właściciela produktu na pytania specjalisty ds. fin
 | H1 | Edukacja: krótkie karty + podpowiedzi kontekstowe + glosariusz |
 | H2 | Treści wbudowane, aktualizacja z nowym wydaniem; fakty zmienne w jednym pliku konfiguracji z datą weryfikacji |
 | I1 | Kalkulatory w MVP: fundusz awaryjny i plan celu; procent składany i inflacja; konto/lokata/obligacje z podatkiem Belki. Symulatory IKE/IKZE, PPK i ETF przeniesione do etapu 2 (decyzja właściciela) |
+| I1 (zmiana) | Decyzja PM Z2 zawęża kalkulatory etapu 1 do funduszu awaryjnego i planu celu; pozostałe z I1 poza etapem 1 (patrz runda-1-pm.md) |
 | I2 | Symulatory: trzy scenariusze (pesymistyczny, bazowy, optymistyczny), wartości jawnie oznaczone jako przykład, edytowalne |
 | I3 | Wyniki symulacji: trzy scenariusze obok siebie z zakresem (bez Monte Carlo) |
 | J2 | Personalizowane sugestie tylko dla oszczędzania/budżetu, nigdy dla instrumentów |
