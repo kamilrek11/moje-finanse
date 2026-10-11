@@ -19,12 +19,12 @@ Status: w toku. Odpowiedzi właściciela produktu na pytania specjalisty ds. fin
 | F1 | Produkty w treściach/symulatorach: konto oszczędnościowe i lokata, obligacje skarbowe detaliczne, IKE/IKZE, ETF-y |
 | D3 | Fundusz awaryjny: neutralne kategorie produktów (konto oszczędnościowe, lokata, obligacje krótkoterminowe) z opisem cech, bez nazw instytucji |
 | E1 | Typy celów: jednorazowy wydatek, wkład własny, emerytura/długi termin, cel bez terminu |
-| F2 | PPK: karta edukacyjna + prosty symulator wpłat (parametry do weryfikacji w źródle) |
-| F3 | IKE/IKZE: karty edukacyjne + prosty symulator wpłat w trzech scenariuszach, bez porównania z inwestowaniem poza IKE/IKZE |
+| F2 | PPK: karta edukacyjna w MVP; prosty symulator wpłat w etapie 2 (parametry do weryfikacji w źródle) |
+| F3 | IKE/IKZE: karty edukacyjne w MVP; prosty symulator wpłat w trzech scenariuszach w etapie 2, bez porównania z inwestowaniem poza IKE/IKZE |
 | G1 | Podatki: wyniki brutto + uproszczony podatek Belki jako opcja |
 | H1 | Edukacja: krótkie karty + podpowiedzi kontekstowe + glosariusz |
 | H2 | Treści wbudowane, aktualizacja z nowym wydaniem; fakty zmienne w jednym pliku konfiguracji z datą weryfikacji |
-| I1 | Kalkulatory w MVP: fundusz awaryjny i plan celu; procent składany i inflacja; konto/lokata/obligacje z podatkiem Belki; IKE/IKZE, PPK i ETF |
+| I1 | Kalkulatory w MVP: fundusz awaryjny i plan celu; procent składany i inflacja; konto/lokata/obligacje z podatkiem Belki. Symulatory IKE/IKZE, PPK i ETF przeniesione do etapu 2 (decyzja właściciela) |
 | I2 | Symulatory: trzy scenariusze (pesymistyczny, bazowy, optymistyczny), wartości jawnie oznaczone jako przykład, edytowalne |
 | I3 | Wyniki symulacji: trzy scenariusze obok siebie z zakresem (bez Monte Carlo) |
 | J2 | Personalizowane sugestie tylko dla oszczędzania/budżetu, nigdy dla instrumentów |
@@ -34,8 +34,8 @@ Status: w toku. Odpowiedzi właściciela produktu na pytania specjalisty ds. fin
 ## Ryzyka do śledzenia
 - **J1:** właściciel nie planuje konsultacji prawnej (KNF/MiFID II). Zapisane jako ryzyko. Treści inwestycyjne trzymać na poziomie ogólnej edukacji, bez nazw instytucji i instrumentów, bez rankingów produktów.
 
-## Sprzeczność do rozstrzygnięcia
-- **A1 vs I1:** A1 mówi, że inwestowanie (treści i symulatory) jest w kolejnym etapie, a I1 włącza do MVP symulatory IKE/IKZE, PPK i ETF. Do decyzji (PM): symulatory inwestycyjne w MVP albo etap 2. Wpływa na zakres, weryfikację faktów i ryzyko prawne (J1).
+## Rozstrzygnięta sprzeczność A1/I1
+Symulatory inwestycyjne (IKE/IKZE, PPK, ETF) przeniesione do etapu 2. W MVP zostają karty edukacyjne o tych produktach (F2, F3 dotyczą etapu 2 w części symulatorów). Wpływ: mniej faktów do weryfikacji w MVP i mniejsze ryzyko prawne w pierwszym wydaniu.
 
 ## Otwarte pytania blokujące MVP z listy finansów osobistych
 Brak. Pozostałe pytania [WAŻNE] i [PÓŹNIEJ] do kolejnych rund.
