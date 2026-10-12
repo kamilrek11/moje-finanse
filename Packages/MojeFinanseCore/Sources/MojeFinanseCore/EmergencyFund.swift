@@ -30,13 +30,14 @@ public enum EmergencyFund {
         return Money(minorUnits: total)
     }
 
-    /// Koszty niezbędne z poprzedniego pełnego miesiąca; gdy ich brak – wartość ręczna, a bez niej zero.
+    /// Koszty niezbędne: większa z wartości – wydatki z poprzedniego miesiąca albo wartość ręczna z onboardingu.
+    /// Częściowo zapisany miesiąc nie może zaniżyć celu; użytkownik obniża cel, edytując wartość ręczną.
     public static func monthlyEssentials(settings: BudgetSettings, categories: [Category],
                                          transactions: [Transaction], referenceMonth: CalendarMonth) -> Money {
         let previous = referenceMonth.adding(months: -1)
         let fromHistory = BudgetMath.summary(settings: settings, categories: categories,
                                              transactions: transactions, month: previous).essentialSpent
-        return fromHistory > .zero ? fromHistory : (settings.manualEssentialCosts ?? .zero)
+        return max(fromHistory, settings.manualEssentialCosts ?? .zero)
     }
 
     public static func assess(monthlyEssentials: Money, targetMonths: Int, balance: Money) throws -> FundAssessment {

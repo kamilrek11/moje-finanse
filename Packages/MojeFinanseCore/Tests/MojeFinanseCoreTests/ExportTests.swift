@@ -65,7 +65,7 @@ final class ExportTests: XCTestCase {
 
     func testBackupJSONIsISO8601WithSortedKeys() throws {
         let json = String(decoding: try sampleBackup().encoded(), as: UTF8.self)
-        XCTAssertTrue(json.contains("\"exportedAt\":\"2026-10-12T10:00:00Z\""))
+        XCTAssertTrue(json.contains("\"exportedAt\":\"2026-10-12T10:00:00.000Z\""))
         XCTAssertLessThan(json.range(of: "\"categories\"")!.lowerBound, json.range(of: "\"transactions\"")!.lowerBound)
     }
 
@@ -75,5 +75,55 @@ final class ExportTests: XCTestCase {
         XCTAssertThrowsError(try BackupDocument.decode(from: Data(json.utf8))) {
             XCTAssertEqual($0 as? BackupError, .unsupportedSchemaVersion(2))
         }
+    }
+
+    func testBackupRoundTripKeepsFractionalSeconds() throws {
+        let transaction = Transaction(date: warsaw(2026, 10, 11).addingTimeInterval(0.7), amount: Money(minorUnits: 100), kind: .expense)
+        let settings = BudgetSettings(baseIncome: Money(minorUnits: 500_000))
+        let original = BackupDocument(exportedAt: warsaw(2026, 10, 12).addingTimeInterval(0.25), settings: settings,
+                                      categories: [], goals: [], transactions: [transaction])
+        let restored = try BackupDocument.decode(from: original.encoded())
+        XCTAssertEqual(restored, original)
+    }
+
+    private func backup(settings: BudgetSettings? = nil, goals: [Goal] = [], transactions: [Transaction] = []) -> BackupDocument {
+        BackupDocument(exportedAt: warsaw(2026, 10, 12),
+                       settings: settings ?? BudgetSettings(baseIncome: Money(minorUnits: 500_000)),
+                       categories: [], goals: goals, transactions: transactions)
+    }
+
+    func testBackupRejectsNegativeAndOverflowingAmounts() throws {
+        let negative = Transaction(date: warsaw(2026, 10, 11), amount: Money(minorUnits: -100), kind: .expense)
+        let huge = Transaction(date: warsaw(2026, 10, 11), amount: Money(minorUnits: Int.max), kind: .expense)
+        let badGoal = Goal(name: "x", target: Money(minorUnits: -1))
+        let badIncome = BudgetSettings(baseIncome: Money(minorUnits: Money.maximum.minorUnits + 1))
+        let badOpening = BudgetSettings(baseIncome: Money(minorUnits: 100), openingFundBalance: Money(minorUnits: -5))
+        let documents = [backup(transactions: [negative]), backup(transactions: [huge]), backup(goals: [badGoal]),
+                         backup(settings: badIncome), backup(settings: badOpening)]
+        for document in documents {
+            let data = try document.encoded()
+            XCTAssertThrowsError(try BackupDocument.decode(from: data)) {
+                XCTAssertEqual($0 as? BackupError, .amountOutOfRange)
+            }
+        }
+    }
+
+    func testBackupRejectsInvalidFundTargetMonthsAndSchemaVersion() throws {
+        let badMonths = BudgetSettings(baseIncome: Money(minorUnits: 100), fundTargetMonths: 12)
+        XCTAssertThrowsError(try BackupDocument.decode(from: backup(settings: badMonths).encoded())) {
+            XCTAssertEqual($0 as? BackupError, .invalidFundTargetMonths(12))
+        }
+        let json = String(decoding: try backup().encoded(), as: UTF8.self)
+            .replacingOccurrences(of: "\"schemaVersion\":1", with: "\"schemaVersion\":0")
+        XCTAssertThrowsError(try BackupDocument.decode(from: Data(json.utf8))) {
+            XCTAssertEqual($0 as? BackupError, .unsupportedSchemaVersion(0))
+        }
+    }
+
+    func testBackupAcceptsBoundaryAmounts() throws {
+        let boundary = Transaction(date: warsaw(2026, 10, 11), amount: .maximum, kind: .income)
+        let zeroOpening = BudgetSettings(baseIncome: .zero, openingFundBalance: .zero)
+        let document = backup(settings: zeroOpening, transactions: [boundary])
+        XCTAssertEqual(try BackupDocument.decode(from: document.encoded()), document)
     }
 }

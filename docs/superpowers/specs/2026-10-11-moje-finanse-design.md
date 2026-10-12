@@ -121,3 +121,10 @@ Dane tylko na urządzeniu i w prywatnym iCloud użytkownika; aplikacja niczego s
 - A2–A5 (architekt): konkretne minimalne wersje iOS, szczegóły modelu danych, format pliku faktów, zasady zaokrągleń.
 - Kryteria przejścia z etapu 1 do 2 i progi liczbowe CEL-2 (G1, G2).
 - Pozostałe pytania [WAŻNE] i [PÓŹNIEJ] z czterech logów wchodzą w kolejne rundy per plaster.
+
+### Decyzje podjęte w planie i po przeglądzie kodu (do potwierdzenia)
+- Koszty niezbędne funduszu = większa z wartości: wydatki w kategoriach niezbędnych z poprzedniego miesiąca albo wartość ręczna z onboardingu. Częściowo zapisany miesiąc nie zaniża celu; aby obniżyć cel, użytkownik edytuje wartość ręczną.
+- Wypłata z funduszu lub celu zmniejsza jego saldo, ale nie zwiększa przychodu i nie zużywa koszyka. Wydatek w kategorii przypisanej do koszyka oszczędności liczy się do zużycia tego koszyka.
+- Domyślna miesięczna wpłata do wyliczeń funduszu = limit koszyka oszczędności (edytowalna); domyślny cel funduszu = 3 miesiące.
+- Kopia JSON (`BackupDocument`): daty ISO 8601 z dokładnością do milisekundy; przy wczytaniu walidowane kwoty (0…999 999 999,99 zł), wersja schematu (1…obsługiwana) i liczba miesięcy funduszu (3…6).
+- Do Części B (zadania 13 i 17): pole kwoty wpisu odrzuca zero (`Money(parsing:)` je akceptuje, bo 0 zł oszczędności jest poprawne w onboardingu); eksport CSV jako bajty z BOM UTF-8 (Excel inaczej zniekształci polskie znaki).

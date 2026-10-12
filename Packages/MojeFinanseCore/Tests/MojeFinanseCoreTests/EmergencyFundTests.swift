@@ -74,4 +74,13 @@ final class EmergencyFundTests: XCTestCase {
         ]
         XCTAssertEqual(EmergencyFund.balance(settings: settings, transactions: transactions), zl(1250))
     }
+
+    func testPartiallyRecordedPreviousMonthDoesNotUnderstateManualEssentials() {
+        let food = Category(name: "Jedzenie", symbol: "cart", bucket: .needs, isEssential: true, sortOrder: 0)
+        let settings = BudgetSettings(baseIncome: zl(5000), manualEssentialCosts: zl(3000))
+        let partial = [Transaction(date: warsaw(2026, 9, 28), amount: zl(50), kind: .expense, categoryID: food.id)]
+        let result = EmergencyFund.monthlyEssentials(settings: settings, categories: [food], transactions: partial,
+                                                     referenceMonth: CalendarMonth(year: 2026, month: 10))
+        XCTAssertEqual(result, zl(3000))
+    }
 }

@@ -53,10 +53,12 @@ public enum TransactionCSV {
 
 public enum BackupError: Error, Equatable {
     case unsupportedSchemaVersion(Int)
+    case amountOutOfRange
+    case invalidFundTargetMonths(Int)
 }
 
 /// Pełna kopia danych aplikacji w JSON. To eksport, nie kopia zapasowa iCloud.
-/// Daty zapisywane są w ISO 8601 z dokładnością do sekundy.
+/// Daty zapisywane są w ISO 8601 z dokładnością do milisekundy.
 public struct BackupDocument: Codable, Equatable, Sendable {
     public static let currentSchemaVersion = 1
 
@@ -78,19 +80,50 @@ public struct BackupDocument: Codable, Equatable, Sendable {
     }
 
     public func encoded() throws -> Data {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
+        encoder.dateEncodingStrategy = .custom { date, encoder in
+            var container = encoder.singleValueContainer()
+            try container.encode(formatter.string(from: date))
+        }
         encoder.outputFormatting = [.sortedKeys]
         return try encoder.encode(self)
     }
 
+    /// Wczytuje i waliduje kopię: kwoty muszą mieścić się w 0...`Money.maximum`,
+    /// `schemaVersion` w 1...`currentSchemaVersion`, `fundTargetMonths` w 3...6.
     public static func decode(from data: Data) throws -> BackupDocument {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let whole = ISO8601DateFormatter()
+        whole.formatOptions = [.withInternetDateTime]
         let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
+        decoder.dateDecodingStrategy = .custom { decoder in
+            let text = try decoder.singleValueContainer().decode(String.self)
+            guard let date = fractional.date(from: text) ?? whole.date(from: text) else {
+                throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath,
+                                                        debugDescription: "Niepoprawna data ISO 8601: \(text)"))
+            }
+            return date
+        }
         let document = try decoder.decode(BackupDocument.self, from: data)
-        guard document.schemaVersion <= currentSchemaVersion else {
+        guard document.schemaVersion >= 1, document.schemaVersion <= currentSchemaVersion else {
             throw BackupError.unsupportedSchemaVersion(document.schemaVersion)
         }
+        guard EmergencyFund.allowedMonths.contains(document.settings.fundTargetMonths) else {
+            throw BackupError.invalidFundTargetMonths(document.settings.fundTargetMonths)
+        }
+        try document.validateAmounts()
         return document
+    }
+
+    private func validateAmounts() throws {
+        var amounts = [settings.baseIncome, settings.openingFundBalance]
+        if let manual = settings.manualEssentialCosts { amounts.append(manual) }
+        amounts += transactions.map(\.amount)
+        amounts += goals.flatMap { [$0.target, $0.initial] }
+        let range = 0...Money.maximum.minorUnits
+        guard amounts.allSatisfy({ range.contains($0.minorUnits) }) else { throw BackupError.amountOutOfRange }
     }
 }
