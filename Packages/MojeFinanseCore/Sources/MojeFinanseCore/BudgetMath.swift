@@ -27,3 +27,61 @@ public enum BudgetMath {
         return floors.mapValues { Money(minorUnits: $0) }
     }
 }
+
+public struct BucketStatus: Hashable, Sendable {
+    public let bucket: Bucket
+    public let limit: Money
+    public let spent: Money
+    /// `limit - spent`; może być ujemne.
+    public let remaining: Money
+}
+
+public struct BudgetSummary: Hashable, Sendable {
+    public let month: CalendarMonth
+    public let income: Money
+    public let buckets: [BucketStatus]
+    public let essentialSpent: Money
+    /// Wydatki, których kategoria nie istnieje (np. po błędzie danych) – nie giną po cichu.
+    public let uncategorized: Money
+}
+
+extension BudgetMath {
+    /// Podsumowanie jednego miesiąca kalendarzowego (Europe/Warsaw).
+    /// Wypłaty z funduszu i celów nie zmieniają ani przychodu, ani zużycia koszyków.
+    public static func summary(settings: BudgetSettings, categories: [Category],
+                               transactions: [Transaction], month: CalendarMonth) -> BudgetSummary {
+        let byID = Dictionary(categories.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        var extraIncome = 0
+        var spent: [Bucket: Int] = [:]
+        var essential = 0
+        var uncategorized = 0
+        for transaction in transactions where CalendarMonth(containing: transaction.date) == month {
+            let amount = transaction.amount.minorUnits
+            switch transaction.kind {
+            case .income:
+                extraIncome += amount
+            case .expense:
+                guard let id = transaction.categoryID, let category = byID[id] else {
+                    uncategorized += amount
+                    continue
+                }
+                spent[category.bucket, default: 0] += amount
+                if category.isEssential { essential += amount }
+            case .fundDeposit, .goalDeposit:
+                spent[.savings, default: 0] += amount
+            case .fundWithdrawal, .goalWithdrawal:
+                break
+            }
+        }
+        let income = Money(minorUnits: settings.baseIncome.minorUnits + extraIncome)
+        let limits = limits(income: income, shares: settings.shares)
+        let statuses = Bucket.allCases.map { bucket -> BucketStatus in
+            let limit = limits[bucket] ?? .zero
+            let used = Money(minorUnits: spent[bucket] ?? 0)
+            return BucketStatus(bucket: bucket, limit: limit, spent: used, remaining: limit - used)
+        }
+        return BudgetSummary(month: month, income: income, buckets: statuses,
+                             essentialSpent: Money(minorUnits: essential),
+                             uncategorized: Money(minorUnits: uncategorized))
+    }
+}
